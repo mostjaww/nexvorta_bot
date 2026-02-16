@@ -1,5 +1,17 @@
 {
-  "Programmer": [],
-  "UI/UX Design": [],
-  "Administration": []
+  "Programmer": [
+    "Fix bug dashboard",
+    "Integrasi API export",
+    "Optimasi database"
+  ],
+  "UI/UX Design": [
+    "Redesign landing page",
+    "Update design system",
+    "Improve mobile UI"
+  ],
+  "Administration": [
+    "Update laporan mingguan",
+    "Review dokumen export",
+    "Follow up client email"
+  ]
 }
