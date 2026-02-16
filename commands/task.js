@@ -7,7 +7,10 @@ module.exports = {
     .setDescription("Menampilkan task sesuai role kamu"),
 
   async execute(interaction) {
-    const tasksData = JSON.parse(fs.readFileSync("./data/tasks.json", "utf8"));
+    const path = require("path");
+    const filePath = path.join(__dirname, "..", "data", "tasks.json");
+
+    const tasksData = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
     const roles = interaction.member.roles.cache.map((role) => role.name);
     const foundRole = roles.find((role) => tasksData[role]);
