@@ -1,57 +1,33 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { REST, Routes } = require('discord.js');
 
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers
-    ]
-});
-
-client.commands = new Collection();
-
-// ================= LOAD COMMANDS =================
+const commands = [];
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    client.commands.set(command.data.name, command);
+    commands.push(command.data.toJSON());
 }
 
-// ================= LOAD EVENTS =================
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-for (const file of eventFiles) {
-    const event = require(`./events/${file}`);
-    event(client);
-}
-
-// ================= READY =================
-client.once('clientReady', () => {
-    console.log(`Bot online sebagai ${client.user.tag}`);
-});
-
-// ================= INTERACTION HANDLER =================
-client.on('interactionCreate', async interaction => {
-
-    if (!interaction.isChatInputCommand()) return;
-
-    const command = client.commands.get(interaction.commandName);
-    if (!command) return;
-
+(async () => {
     try {
-        await command.execute(interaction);
+        console.log('Mendaftarkan slash commands...');
+
+        await rest.put(
+            Routes.applicationGuildCommands(
+                process.env.CLIENT_ID,
+                process.env.GUILD_ID
+            ),
+            { body: commands }
+        );
+
+        console.log('Slash commands berhasil didaftarkan.');
     } catch (error) {
         console.error(error);
-        await interaction.reply({
-            content: 'Terjadi kesalahan saat menjalankan command.',
-            ephemeral: true
-        });
     }
-});
-
-client.login(process.env.TOKEN);
+})();
