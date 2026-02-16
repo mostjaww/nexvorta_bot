@@ -11,16 +11,8 @@ module.exports = {
       .setTitle("📘 Nexvorta Bot Commands")
       .setDescription("Berikut adalah command yang tersedia:")
       .addFields(
-        {
-          name: "🗂 /task",
-          value: "Menampilkan task sesuai role kamu",
-          inline: false,
-        },
-        {
-          name: "❓ /help",
-          value: "Menampilkan daftar command",
-          inline: false,
-        },
+        { name: "🗂 /task", value: "Menampilkan task sesuai role kamu" },
+        { name: "❓ /help", value: "Menampilkan daftar command" },
       )
       .setFooter({ text: "Nexvorta Management System 🚀" })
       .setTimestamp();
