@@ -24,24 +24,6 @@ for (const file of commandFiles) {
   client.commands.set(command.data.name, command);
 }
 
-// Interaction handler
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
-
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
-
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    await interaction.reply({
-      content: "Terjadi kesalahan.",
-      ephemeral: true,
-    });
-  }
-});
-
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isAutocomplete()) {
     const command = client.commands.get(interaction.commandName);
