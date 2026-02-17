@@ -1,33 +1,51 @@
 require('dotenv').config();
+
 const fs = require('fs');
 const path = require('path');
-const { REST, Routes } = require('discord.js');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
-const commands = [];
+console.log("STARTING BOT...");
+console.log("TOKEN:", process.env.TOKEN);
+
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers
+    ]
+});
+
+client.commands = new Collection();
+
+// Load commands
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    commands.push(command.data.toJSON());
+    client.commands.set(command.data.name, command);
 }
 
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+// Interaction handler
+client.on('interactionCreate', async interaction => {
 
-(async () => {
+    if (!interaction.isChatInputCommand()) return;
+
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+
     try {
-        console.log('Mendaftarkan slash commands...');
-
-        await rest.put(
-            Routes.applicationGuildCommands(
-                process.env.CLIENT_ID,
-                process.env.GUILD_ID
-            ),
-            { body: commands }
-        );
-
-        console.log('Slash commands berhasil didaftarkan.');
+        await command.execute(interaction);
     } catch (error) {
         console.error(error);
+        await interaction.reply({
+            content: "Terjadi kesalahan.",
+            ephemeral: true
+        });
     }
-})();
+});
+
+client.once('clientReady', () => {
+    console.log(`Bot online sebagai ${client.user.tag}`);
+});
+
+client.login(process.env.TOKEN);
